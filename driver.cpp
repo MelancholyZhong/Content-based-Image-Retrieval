@@ -7,6 +7,8 @@
 #include <opencv2/opencv.hpp>
 
 #include "colorHistogram.h"
+#include "texture.h"
+#include "complex.h"
 
 int main(int argc, char *argv[]) {
         cv::Mat target;
@@ -29,9 +31,18 @@ int main(int argc, char *argv[]) {
         colorHistogramCalc(target, feature1);
         cv::Mat feature2;
         colorHistogramCalc(candidate, feature2);
-        float distance = colorHistogramDis(feature1, feature2);
-        std::cout << "distance between them is: "<< distance << std::endl;
+        float colorDis = colorHistogramDis(feature1, feature2);
+        std::cout << "color histogram distance between them is: "<< colorDis << std::endl;
 
-        
+        cv::Mat feature3;
+        magnitudeHistogramCalc(target, feature3);
+        cv::Mat feature4;
+        magnitudeHistogramCalc(candidate, feature4);
+        float magDis = magnitudeHistogramDis(feature3, feature4);
+        std::cout << "magnitude histogram distance between them is: "<< magDis << std::endl;
+
+        float mag_color = magnitude_color(colorDis, magDis);
+        std::cout << "magnitude_color distance between them is: "<< mag_color << std::endl;
+
         return 0;       
 }

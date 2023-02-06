@@ -7,7 +7,7 @@ PRODUCTS = driver
 OPENCV = `pkg-config opencv4 --cflags --libs`
 LIBS = $(OPENCV)
 
-driver : driver.cpp colorHistogram.cpp
+driver : driver.cpp colorHistogram.cpp texture.cpp complex.cpp
 	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
 
 .PHONY: clean
