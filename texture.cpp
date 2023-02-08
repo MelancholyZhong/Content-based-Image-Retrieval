@@ -112,16 +112,11 @@ int magnitudeHistogramCalc(cv::Mat &src, cv::Mat &feature){
     return 0;
 }
 
-float magnitudeHistogramDis(cv::Mat &target, cv::Mat &candidate ){
+float magnitudeHistogramDis(verctor<float> &target, verctor<float> &candidate){
     float distance = 0;
-    for(int i=0; i<8; i++){
-        for(int j=0; j<8; j++){
-            float *tptr = target.ptr<float>(i,j);
-             float *cptr = candidate.ptr<float>(i,j);
-            for(int k=0; k<8; k++){
-               distance += std::min(tptr[k], cptr[k]);
-            }
-        }
+    int size = candidate.size();
+    for(int i=0; i<size; i++){
+        distance += std::min(target[i], candidate[i]);
     }
     return distance;
 }
