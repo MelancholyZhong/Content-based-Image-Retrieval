@@ -1,7 +1,9 @@
 #include <iostream>
 #include <cmath>
 #include <opencv2/opencv.hpp>
-#include "texture.h"
+#include "histograms.h"
+
+using namespace std;
 
 //Solbel filters and magnitude filters from project #1 used in this problem
 
@@ -35,7 +37,6 @@ int sobel_calc(cv::Mat &src, cv::Mat &dst, int (&sobel)[3][3]){
     return 0;
 }
 
-
 int sobelX3x3(cv::Mat &src, cv::Mat &dst ){
     int xsobel[3][3] = {
         {-1,0,1},
@@ -45,8 +46,6 @@ int sobelX3x3(cv::Mat &src, cv::Mat &dst ){
     sobel_calc(src,dst, xsobel);
     return 0;
 }
-
-
 
 int sobelY3x3( cv::Mat &src, cv::Mat &dst ){
     int ysobel[3][3] = {
@@ -74,11 +73,10 @@ int magnitude( cv::Mat &sx, cv::Mat &sy, cv::Mat &dst ){
     return 0;
 }
 
-//magnitude histogram calculations
 
-int magnitudeHistogramCalc(cv::Mat &src, cv::Mat &feature){
-    int size[] = {8, 8, 8};
-    feature = cv::Mat::zeros(3, size, CV_32FC1);
+int magnitudeHistogram(cv::Mat &src, std::vector<float> &feature){
+    int size = 8*8*8;
+    feature = vector<float>(size, 0.0);
 
     //calculate the magnitude version of the image
     cv::Mat xSobel;
@@ -95,19 +93,62 @@ int magnitudeHistogramCalc(cv::Mat &src, cv::Mat &feature){
             int bin0 = rptr[j][0]/32;  //determin which bin it is, here are 8 bins for [0,255]
             int bin1 = rptr[j][1]/32;
             int bin2 = rptr[j][2]/32;
-            float *fptr = feature.ptr<float>(bin0,bin1);
-            fptr[bin2] += 1;
+            int bin = bin0*8*8 + bin1*8 + bin2;
+            feature[bin] += 1;
         }
     }
 
     //normalization
-    for(int i=0; i<8; i++){
-        for(int j=0; j<8; j++){
-            float *fptr = feature.ptr<float>(i,j);
-            for(int k=0; k<8; k++){
-                fptr[k] = fptr[k]/(src.rows*src.cols);
-            }
-        }
+    for(int i=0; i<feature.size(); i++){
+        feature[i] = feature[i]/(src.rows*src.cols);  
     }
     return 0;
 }
+
+
+int calculateBin(int centerX, int centerY, int x, int y){
+    if(centerX == x){
+        return 9;
+    }
+    double fraction = (double)(centerY-y)/(centerX-x);
+    int bin = (int) (std::atan(fraction)*18/3.1415926)%18;
+    return bin;
+}
+
+int tangentAngle(cv::Mat &src, vector<float> &feature){
+    //calculate the magnitude version of the image
+    cv::Mat xSobel;
+    cv::Mat ySobel;
+    cv::Mat magnitudeImg;
+    sobelX3x3(src,xSobel);
+    sobelY3x3(src,ySobel);
+    magnitude(xSobel, ySobel, magnitudeImg);
+    std::cout << "magnitude calculated"<< std::endl;
+
+    feature = vector<float>(18, 0.0);
+    int pixelCount = 0;
+    int centerX = src.cols/2;
+    int centerY = src.rows/2;
+
+    for(int i=0;i<src.rows; i++){
+        cv::Vec3b *rptr = magnitudeImg.ptr<cv::Vec3b>(i);
+        for(int j=0;j<src.cols;j++){
+           if(rptr[j][0]>15 && rptr[j][1]>15 && rptr[j][2]>15){
+                pixelCount += 1;
+                int bin = calculateBin(centerX, centerY, j, i);
+                feature[bin] += 1;
+           }
+        }
+    }
+    std::cout << "calculated angles: "<< std::endl;
+
+    for(int i=0; i<feature.size(); i++){
+        feature[i] = feature[i]/pixelCount;
+    }
+    std::cout << "this feature finised "<< std::endl;
+
+
+    return 0;
+}
+
+

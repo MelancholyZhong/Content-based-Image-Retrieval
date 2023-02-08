@@ -7,7 +7,7 @@ PRODUCTS = driver match test.csv
 OPENCV = `pkg-config opencv4 --cflags --libs`
 LIBS = $(OPENCV)
 
-driver : driver.cpp colorHistogram.cpp texture.cpp complex.cpp
+driver : driver.cpp histograms.cpp distances.cpp
 	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
 
 match : main.cpp matchingAlgo.cpp fileHelper.cpp
