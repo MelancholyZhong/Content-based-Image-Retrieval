@@ -5,6 +5,31 @@
 
 using namespace std;
 
+
+int colorHistogram(cv::Mat &src, std::vector<float> &feature){
+    int size = 8*8*8;
+    feature = vector<float>(size, 0.0);
+
+    //counting
+    for(int i=0;i<src.rows; i++){
+        cv::Vec3b *rptr = src.ptr<cv::Vec3b>(i);
+        for(int j=0;j<src.cols;j++){
+            int bin0 = rptr[j][0]/32;  //determin which bin it is, here are 8 bins for [0,255]
+            int bin1 = rptr[j][1]/32;
+            int bin2 = rptr[j][2]/32;
+            int bin = bin0*8*8 + bin1*8 + bin2;
+            feature[bin] += 1;
+        }
+    }
+
+     //normalization
+    for(int i=0; i<feature.size(); i++){
+        feature[i] = feature[i]/(src.rows*src.cols);  
+    }
+    return 0;
+}
+
+
 //Solbel filters and magnitude filters from project #1 used in this problem
 
 int sobel_calc(cv::Mat &src, cv::Mat &dst, int (&sobel)[3][3]){
@@ -115,40 +140,48 @@ int calculateBin(int centerX, int centerY, int x, int y){
     return bin;
 }
 
-int tangentAngle(cv::Mat &src, vector<float> &feature){
-    //calculate the magnitude version of the image
-    cv::Mat xSobel;
-    cv::Mat ySobel;
-    cv::Mat magnitudeImg;
-    sobelX3x3(src,xSobel);
-    sobelY3x3(src,ySobel);
-    magnitude(xSobel, ySobel, magnitudeImg);
-    std::cout << "magnitude calculated"<< std::endl;
-
-    feature = vector<float>(18, 0.0);
-    int pixelCount = 0;
-    int centerX = src.cols/2;
-    int centerY = src.rows/2;
-
-    for(int i=0;i<src.rows; i++){
-        cv::Vec3b *rptr = magnitudeImg.ptr<cv::Vec3b>(i);
-        for(int j=0;j<src.cols;j++){
-           if(rptr[j][0]>15 && rptr[j][1]>15 && rptr[j][2]>15){
-                pixelCount += 1;
-                int bin = calculateBin(centerX, centerY, j, i);
-                feature[bin] += 1;
-           }
+// a feature that descibes the main color's dstribution in the space
+int objectSpatial(cv::Mat &src, std::vector<float> &feature){
+    //Calculate the primary colors in the image
+    std::vector<float> colorDensity;
+    colorHistogram(src, colorDensity);
+    int mainColor = 0;
+    float maxDistribution = 0.0;
+    for(int i=0; i<colorDensity.size(); i++){
+        if(colorDensity[i]>maxDistribution){
+            mainColor = i;
+            maxDistribution = colorDensity[i];
         }
     }
-    std::cout << "calculated angles: "<< std::endl;
 
-    for(int i=0; i<feature.size(); i++){
-        feature[i] = feature[i]/pixelCount;
+    //calculate how this color is preaded in this image(16 bins in both x and y)
+    std::vector<float> spacialSpread = std::vector<float>(32, 0.0);
+    int xBinLength = (src.cols+15)/16; //+15 to make sure the 16 bins contains all pixels.
+    int yBinLength = (src.rows+15)/16;
+    int pixelCount = 0;
+    //counting
+    for(int i=0;i<src.rows; i++){
+        cv::Vec3b *rptr = src.ptr<cv::Vec3b>(i);
+        int binY = i/yBinLength;
+        for(int j=0;j<src.cols;j++){
+            int binX = j/xBinLength;
+            int bin0 = rptr[j][0]/32;  //determin which color bin it is, here are 8 bins for [0,255]
+            int bin1 = rptr[j][1]/32;
+            int bin2 = rptr[j][2]/32;
+            int bin = bin0*8*8 + bin1*8 + bin2;
+            if(bin == mainColor){
+                pixelCount += 1;
+                spacialSpread[binX] += 1;
+                spacialSpread[16+binY] += 1;
+            }
+        }
     }
-    std::cout << "this feature finised "<< std::endl;
 
+    //normalization
+    for(int i=0; i<spacialSpread.size(); i++){
+        spacialSpread[i] = spacialSpread[i]/pixelCount;
+    }
 
+    feature = spacialSpread;
     return 0;
 }
-
-

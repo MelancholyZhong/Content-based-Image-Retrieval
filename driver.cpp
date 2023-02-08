@@ -27,16 +27,14 @@ int main(int argc, char *argv[]) {
                 std::cout << "Can't read the image" << std::endl;
                 exit(-1);
         }
-
-        std::cout << "tangent angle distance between them is: "<< std::endl;
         
-        // cv::Mat feature1;
-        // colorHistogramCalc(target, feature1);
-        // cv::Mat feature2;
-        // colorHistogramCalc(candidate, feature2);
+        std::vector<float> feature1;
+        colorHistogram(target, feature1);
+        std::vector<float> feature2;
+        colorHistogram(candidate, feature2);
 
-        // float colorDis = colorHistogramDis(feature1, feature2);
-        // std::cout << "color histogram distance between them is: "<< colorDis << std::endl;
+        float colorDis = intersection(feature1, feature2);
+        std::cout << "color histogram distance between them is: "<< colorDis << std::endl;
 
         std::vector<float> feature3;
         magnitudeHistogram(target, feature3);
@@ -47,15 +45,18 @@ int main(int argc, char *argv[]) {
 
         // float mag_color = magnitude_color(colorDis, magDis);
         // std::cout << "magnitude_color distance between them is: "<< mag_color << std::endl;
-                
-        // vector<float> feature6;
-        // tangentAngle(candidate, feature6);
+       
+        vector<float> feature5;
+        objectSpatial(target, feature5);
+        vector<float> feature6;
+        objectSpatial(candidate, feature6);
+        // std::cout<<"counted feature space"<<std::endl;
         // for(auto i:feature6){
-        //         std::cout<<i<<" ";
+        //         std::cout<< i <<" ";
         // }
         // std::cout<<std::endl;
-        // float taDis = intersection(feature5, feature6);
-        // std::cout << "tangent angle distance between them is: "<< taDis << std::endl;
+        float taDis = intersection(feature5, feature6)*0.5;
+        std::cout << "tangent angle distance between them is: "<< taDis << std::endl;
 
         return 0;       
 }
