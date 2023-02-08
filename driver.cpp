@@ -44,5 +44,6 @@ int main(int argc, char *argv[]) {
         float mag_color = magnitude_color(colorDis, magDis);
         std::cout << "magnitude_color distance between them is: "<< mag_color << std::endl;
 
+
         return 0;       
 }

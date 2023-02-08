@@ -3,6 +3,6 @@
 
 int colorHistogramCalc(cv::Mat &src, cv::Mat &feature);
 
-float colorHistogramDis(cv::Mat &target, cv::Mat &candidate);
+float colorHistogramDis(verctor<float> &target, verctor<float> &candidate);
 
 #endif
