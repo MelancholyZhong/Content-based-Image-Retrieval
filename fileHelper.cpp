@@ -9,13 +9,14 @@
 #include <vector>
 #include <iostream>
 #include <dirent.h>
-#include <queue> // for min heap
+#include "matchingAlgo.h"
+#include <queue>     // for min heap
+#include <algorithm> // std::reverse
 
 // openCV
 #include <opencv2/opencv.hpp>
-#include <opencv2/imgcodecs.hpp>
-#include <opencv2/imgproc.hpp>
-
+// #include <opencv2/imgcodecs.hpp>
+// #include <opencv2/imgproc.hpp>
 
 using namespace std;
 using namespace cv;
@@ -36,11 +37,13 @@ int appendFeatureVec(char *filename, char *dirname, char matchingAlgo)
     char mode[8];
     FILE *fp;
     bool reset = false;
-    vector<int> image_data = {1, 2, 3, 4};
-    Mat featureVec;
     // Variables for Directory
     DIR *dirp;
     struct dirent *dp;
+    // Temp variabls
+    vector<float> feature;
+    Mat candidate;
+    char tmp[256];
 
     // Open the directory
     dirp = opendir(dirname);
@@ -89,23 +92,25 @@ int appendFeatureVec(char *filename, char *dirname, char matchingAlgo)
             // Write the imagename and the feature vector to the CSV file
             fwrite(dp->d_name, sizeof(char), strlen(dp->d_name), fp);
 
+            // Get candidate image
+            candidate = imread(buffer);
 
             // Get the feature vector
             switch (matchingAlgo)
             {
             case 'b':
-                
+                baselineMatch(candidate, feature);
                 break;
             default:
                 break;
             }
 
             // Write feature vector to CSV file
-            char tmp[256];
-            for (int i = 0; i < image_data.size(); i++)
+
+            for (int i = 0; i < feature.size(); i++)
             {
                 // Write formatted data to string
-                sprintf(tmp, ",%.4f", (float)image_data[i]);
+                sprintf(tmp, ",%.4f", feature[i]);
                 fwrite(tmp, sizeof(char), strlen(tmp), fp);
             }
 
@@ -198,14 +203,10 @@ int getfloat(FILE *fp, float *v)
   The function returns a non-zero value if something goes wrong.
  */
 
-int readFeatureVec(char *filename, std::vector<char *> &filenames, std::vector<std::vector<float>> &data, int echo_file)
-{
-}
-
 // Global variable
 map<string, float> dict; // store (image_name, distance) pairs
 
-// To compare two points
+// To compare two iamges according to their distances with target image
 class Comparator
 {
 public:
@@ -230,7 +231,7 @@ vector<string> readFeatureVec(char *filename, vector<float> &targetVec, char mat
     if (!fp)
     {
         printf("Unable to open feature file\n");
-        return -1;
+        return result;
     }
 
     // Read file
@@ -255,7 +256,7 @@ vector<string> readFeatureVec(char *filename, vector<float> &targetVec, char mat
         switch (matchingAlgo)
         {
         case 'b':
-            distance = 1;
+            distance = baselineDis(targetVec, featureVec);
             break;
         default:
             distance = 3;
@@ -266,7 +267,10 @@ vector<string> readFeatureVec(char *filename, vector<float> &targetVec, char mat
         dict[imagename] = distance;
 
         // Add new distance to min-Heap
-        minHeap.push(imagename);
+        if (distance > 0.001)  // Avoid target image itself
+        {
+            minHeap.push(imagename);
+        }
         if (minHeap.size() > N)
         {
             minHeap.pop();
@@ -275,13 +279,15 @@ vector<string> readFeatureVec(char *filename, vector<float> &targetVec, char mat
 
     // Close CSV file
     fclose(fp);
-    printf("Finished reading CSV file\n");
 
-    // Return names of the N most close images 
-    while(!minHeap.empty()){
+    // Return names of the N most close images
+    while (!minHeap.empty())
+    {
         result.push_back(minHeap.top());
         minHeap.pop();
     }
+
+    reverse(result.begin(), result.end());
 
     return result;
 }

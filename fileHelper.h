@@ -1,5 +1,6 @@
 /*
     Helper functions to deal with files
+    Created by Hui Hu for CS 5330 Computer Vision Spring 2023
 */
 
 #ifndef FILE_HELPER
@@ -12,6 +13,6 @@ using namespace std;
 
 int appendFeatureVec(char *filename, char *dirname, char matchingAlgo);
 
-vector<string> readFeatureVec( char *filename, vector<float> targetVec, char* matchingAlgo, int N=3);
+vector<string> readFeatureVec(char *filename, vector<float> &targetVec, char matchingAlgo, int N = 3);
 
 #endif
