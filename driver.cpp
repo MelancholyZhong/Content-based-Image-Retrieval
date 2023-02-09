@@ -58,5 +58,13 @@ int main(int argc, char *argv[]) {
         float taDis = intersection(feature5, feature6)*0.5;
         std::cout << "tangent angle distance between them is: "<< taDis << std::endl;
 
+        std::vector<float> feature7;
+        spacialVariance(target, feature7);
+        std::cout<<"counted feature space"<<std::endl;
+        for(auto i:feature7){
+                std::cout<< i <<" ";
+        }
+        std::cout<<std::endl;
+
         return 0;       
 }

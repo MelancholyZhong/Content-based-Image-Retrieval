@@ -185,3 +185,52 @@ int objectSpatial(cv::Mat &src, std::vector<float> &feature){
     feature = spacialSpread;
     return 0;
 }
+
+
+int spacialVariance(cv::Mat &src, std::vector<float> &feature){
+    int size = 8*8*8;
+    std::vector<float> m00= vector<float>(size, 0.0); //m00 is the pixel count for each color region
+    std::vector<float> m10= vector<float>(size, 0.0); //m10 is the x total value for each color region, used to caluate x_av
+    std::vector<float> m01= vector<float>(size, 0.0); //m01 similar to m10
+    std::vector<float> miu22 = vector<float>(size, 0.0); //miu22 is to hold the total distance from each pixel to its average center.
+
+    for(int i=0;i<src.rows; i++){
+        cv::Vec3b *rptr = src.ptr<cv::Vec3b>(i);
+        for(int j=0;j<src.cols;j++){
+            int bin0 = rptr[j][0]/32;  //determin which bin it is, here are 8 bins for [0,255]
+            int bin1 = rptr[j][1]/32;
+            int bin2 = rptr[j][2]/32;
+            int bin = bin0*8*8 + bin1*8 + bin2;
+            m00[bin] += 1;
+            m10[bin] += i;
+            m01[bin] += j;
+        }
+    }
+    
+    
+    std::vector<float> x_av = std::vector<float>(size, 0.0);
+    std::vector<float> y_av = std::vector<float>(size, 0.0);
+    for(int i=0; i<size; i++){
+        x_av[i] = m10[i]/m00[i];
+        y_av[i] = m01[i]/m00[i];
+    }
+
+    for(int i=0;i<src.rows; i++){
+        cv::Vec3b *rptr = src.ptr<cv::Vec3b>(i);
+        for(int j=0;j<src.cols;j++){
+            int bin0 = rptr[j][0]/32;  //determin which bin it is, here are 8 bins for [0,255]
+            int bin1 = rptr[j][1]/32;
+            int bin2 = rptr[j][2]/32;
+            int bin = bin0*8*8 + bin1*8 + bin2;
+            miu22[bin] += ((i-x_av[bin])*(i-x_av[bin]) + (j-y_av[bin])*(j-y_av[bin]));
+        }
+    }
+
+    feature = std::vector<float>(size, 0.0);
+    for(int i=0; i<size; i++){
+        feature[i] = miu22[i]/m00[i];
+    }
+    
+    return 0;
+    
+}

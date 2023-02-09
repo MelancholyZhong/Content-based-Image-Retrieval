@@ -7,4 +7,6 @@ int magnitudeHistogram(cv::Mat &src, std::vector<float> &feature);
 
 int objectSpatial(cv::Mat &src, std::vector<float> &feature);
 
+int spacialVariance(cv::Mat &src, std::vector<float> &feature);
+
 #endif
