@@ -10,7 +10,7 @@ LIBS = $(OPENCV)
 driver : driver.cpp histograms.cpp distances.cpp
 	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
 
-match : main.cpp matchingAlgo.cpp fileHelper.cpp
+match : main.cpp matchingAlgo.cpp fileHelper.cpp histograms.cpp distances.cpp
 	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
 
 .PHONY: clean
