@@ -32,7 +32,6 @@ int main(int argc, char *argv[]) {
         colorHistogram(target, feature1);
         std::vector<float> feature2;
         colorHistogram(candidate, feature2);
-
         float colorDis = intersection(feature1, feature2);
         std::cout << "color histogram distance between them is: "<< colorDis << std::endl;
 
@@ -40,11 +39,9 @@ int main(int argc, char *argv[]) {
         magnitudeHistogram(target, feature3);
         std::vector<float> feature4;
         magnitudeHistogram(candidate, feature4);
-        float magDis = intersection(feature3, feature4);
-        std::cout << "magnitude histogram distance between them is: "<< magDis << std::endl;
+        float mcDis = magnitude_color(feature1, feature2, feature3, feature4);
+        std::cout << "magnitude color histogram distance between them is: "<< mcDis << std::endl;
 
-        // float mag_color = magnitude_color(colorDis, magDis);
-        // std::cout << "magnitude_color distance between them is: "<< mag_color << std::endl;
        
         vector<float> feature5;
         objectSpatial(target, feature5);
@@ -55,16 +52,16 @@ int main(int argc, char *argv[]) {
         //         std::cout<< i <<" ";
         // }
         // std::cout<<std::endl;
-        float taDis = intersection(feature5, feature6)*0.5;
+        float taDis = intersection(feature5, feature6);
         std::cout << "tangent angle distance between them is: "<< taDis << std::endl;
 
         std::vector<float> feature7;
         spacialVariance(target, feature7);
-        std::cout<<"counted feature space"<<std::endl;
-        for(auto i:feature7){
-                std::cout<< i <<" ";
-        }
-        std::cout<<std::endl;
+        std::vector<float> feature8;
+        spacialVariance(candidate, feature8);
+        float sDis = similarObject(feature1, feature2, feature7,feature8);
+        std::cout << "spacial distance between them is: "<< sDis << std::endl;
+        
 
         return 0;       
 }

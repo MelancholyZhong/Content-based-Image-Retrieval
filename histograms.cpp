@@ -131,15 +131,6 @@ int magnitudeHistogram(cv::Mat &src, std::vector<float> &feature){
 }
 
 
-int calculateBin(int centerX, int centerY, int x, int y){
-    if(centerX == x){
-        return 9;
-    }
-    double fraction = (double)(centerY-y)/(centerX-x);
-    int bin = (int) (std::atan(fraction)*18/3.1415926)%18;
-    return bin;
-}
-
 // a feature that descibes the main color's dstribution in the space
 int objectSpatial(cv::Mat &src, std::vector<float> &feature){
     //Calculate the primary colors in the image
@@ -179,7 +170,7 @@ int objectSpatial(cv::Mat &src, std::vector<float> &feature){
 
     //normalization
     for(int i=0; i<spacialSpread.size(); i++){
-        spacialSpread[i] = spacialSpread[i]/pixelCount;
+        spacialSpread[i] = spacialSpread[i]/(pixelCount*2);
     }
 
     feature = spacialSpread;
