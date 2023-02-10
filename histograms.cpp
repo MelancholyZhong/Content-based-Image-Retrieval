@@ -130,7 +130,6 @@ int magnitudeHistogram(cv::Mat &src, std::vector<float> &feature){
     return 0;
 }
 
-
 // a feature that descibes the main color's dstribution in the space
 int objectSpatial(cv::Mat &src, std::vector<float> &feature){
     //Calculate the primary colors in the image
@@ -223,5 +222,9 @@ int spacialVariance(cv::Mat &src, std::vector<float> &feature){
     }
     
     return 0;
-    
+}
+
+int twoComposite(std::vector<float> &feature1, std::vector<float> &feature2){
+    feature1.insert(feature1.end(), feature2.begin(), feature2.end());
+    return 0;
 }

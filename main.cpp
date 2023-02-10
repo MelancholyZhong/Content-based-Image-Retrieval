@@ -15,10 +15,10 @@ using namespace cv;
 int main(int argc, char *argv[])
 {
     cv::Mat target = imread("training/pic.0080.jpg");
-    string database = "training/";
+    string database = "training";
     string method = "baseline";
     int N = 3;
-    if (argc < 6)
+    if (argc < 5)
     {
         std::cout << "please input correct arguments" << std::endl;
         // exit(-2);
@@ -29,7 +29,6 @@ int main(int argc, char *argv[])
         target = cv::imread(targetDir);
         database = convertToString(argv[2]);
         method = convertToString(argv[3]);
-        // char *method = argv[3];
         char *outputN = argv[4];
         N = std::stoi(outputN);
     }
@@ -53,45 +52,52 @@ int main(int argc, char *argv[])
         appendFeatureVec(databaseFeature, database, method);
     }
 
-    if (method.compare("baseline") == 0)
+    if (method == "baseline")
     {
         baselineMatch(target, featureVec);
     }
-    else if (method.compare("color") == 0)
+    else if (method == "color")
     {
         colorHistogram(target, featureVec);
     }
-    else if (method.compare("magnitude") == 0)
+    else if (method == "magnitude")
     {
-        magnitudeHistogram(target, featureVec);
+        colorHistogram(target, featureVec);
+        vector<float> featureVec2;
+        magnitudeHistogram(target, featureVec2);
+        twoComposite(featureVec, featureVec2);
     }
-    else if (method.compare("objectSpacial") == 0)
+    else if (method == "objectSpacial")
     {
         objectSpatial(target, featureVec);
     }
-    else if (method.compare("spacialVariance") == 0)
+    else if (method == "spacialVariance")
     {
-        spacialVariance(target, featureVec);
+        colorHistogram(target, featureVec);
+        vector<float> featureVec2;
+        spacialVariance(target, featureVec2);
+        twoComposite(featureVec, featureVec2);
     }
-    else if (method.compare("laws") == 0)
+    else if (method=="laws")
     {
         lawsMatch(target, featureVec);
     }
-    else if (method.compare("multiHistogram") == 0)
+    else if (method=="multiHistogram")
     {
         multiHistogramMatch(target, featureVec);
     }
-    else if (method.compare("coMatrix") == 0)
+    else if (method=="coMatrix")
     {
         comatrixMatch(target, featureVec);
     }
-    else if (method.compare("gradient") == 0)
+    else if (method=="gradient")
     {
         gradientMatch(target, featureVec);
     }
     else
     {
-        baselineMatch(target, featureVec);
+        std::cout << "Please input correct method"<<std::endl;
+        exit(-1);
     }
 
     // Get feature vector of all images in directory and

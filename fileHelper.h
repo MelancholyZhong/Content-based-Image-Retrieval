@@ -11,12 +11,12 @@
 
 using namespace std;
 
-int appendFeatureVec(std::string filename, string dirname, string matchingAlgo);
+int appendFeatureVec(std::string filename, std::string dirname, std::string matchingAlgo);
 
-vector<string> readFeatureVec(std::string filename, vector<float> &targetVec, string matchingAlgo, int N = 3);
+std::vector<std::string> readFeatureVec(std::string filename, std::vector<float> &targetVec, std::string matchingAlgo, int N = 3);
 
-string convertToString(char *a);
-char* convertToCharArray(string s);
-void displayImages(vector<string> imageVec, string filename);
+std::string convertToString(char *a);
+char* convertToCharArray(std::string s);
+void displayImages(std::vector<string> imageVec, std::string filename);
 
 #endif

@@ -119,45 +119,52 @@ int appendFeatureVec(std::string filename, string dirname, string matchingAlgo)
             // Get candidate image
             candidate = imread(buffer);
 
-            if (matchingAlgo.compare("baseline") == 0)
+            if (matchingAlgo == "baseline")
             {
                 baselineMatch(candidate, feature);
             }
-            else if (matchingAlgo.compare("color") == 0)
+            else if (matchingAlgo == "color")
             {
                 colorHistogram(candidate, feature);
             }
-            else if (matchingAlgo.compare("magnitude") == 0)
+            else if (matchingAlgo == "magnitude")
             {
-                magnitudeHistogram(candidate, feature);
+                colorHistogram(candidate, feature);
+                vector<float> feature2;
+                magnitudeHistogram(candidate, feature2);
+                twoComposite(feature, feature2);
             }
-            else if (matchingAlgo.compare("objectSpacial") == 0)
+            else if (matchingAlgo == "objectSpacial")
             {
                 objectSpatial(candidate, feature);
             }
-            else if (matchingAlgo.compare("spacialVariance") == 0)
+            else if (matchingAlgo == "spacialVariance")
             {
-                spacialVariance(candidate, feature);
+                colorHistogram(candidate, feature);
+                vector<float> feature2;
+                spacialVariance(candidate, feature2);
+                twoComposite(feature, feature2);
             }
-            else if (matchingAlgo.compare("laws") == 0)
+            else if (matchingAlgo=="laws")
             {
                 lawsMatch(candidate, feature);
             }
-            else if (matchingAlgo.compare("multiHistogram") == 0)
+            else if (matchingAlgo=="multiHistogram")
             {
                 multiHistogramMatch(candidate, feature);
             }
-            else if (matchingAlgo.compare("coMatrix") == 0)
+            else if (matchingAlgo=="coMatrix")
             {
                 comatrixMatch(candidate, feature);
             }
-            else if (matchingAlgo.compare("gradient") == 0)
+            else if (matchingAlgo=="gradient")
             {
                 gradientMatch(candidate, feature);
             }
             else
             {
-                baselineMatch(candidate, feature);
+                std::cout << "Please input correct method"<<std::endl;
+                exit(-1);
             }
 
             // Write feature vector to CSV file
@@ -168,7 +175,6 @@ int appendFeatureVec(std::string filename, string dirname, string matchingAlgo)
                 sprintf(tmp, ",%.4f", feature[i]);
                 fwrite(tmp, sizeof(char), strlen(tmp), fp);
             }
-
             fwrite("\n", sizeof(char), 1, fp); // EOL
         }
     }
@@ -271,6 +277,7 @@ public:
     }
 };
 
+
 vector<string> readFeatureVec(std::string filename, vector<float> &targetVec, string matchingAlgo, int N = 3)
 {
     vector<string> result = {};
@@ -315,19 +322,19 @@ vector<string> readFeatureVec(std::string filename, vector<float> &targetVec, st
         }
         else if (matchingAlgo.compare("color") == 0)
         {
-            distance = 1; // colorHistogram(targetVec, featureVec);
+            distance = colorDis(targetVec, featureVec); // colorHistogram(targetVec, featureVec);
         }
         else if (matchingAlgo.compare("magnitude") == 0)
         {
-            distance = 1; // magnitudeHistogram(targetVec, featureVec);
+            distance = magnitude_color(targetVec, featureVec); // magnitudeHistogram(targetVec, featureVec);
         }
         else if (matchingAlgo.compare("objectSpacial") == 0)
         {
-            distance = 1; // objectSpatial(targetVec, featureVec);
+            distance = 1 - intersection(targetVec, featureVec);
         }
         else if (matchingAlgo.compare("spacialVariance") == 0)
         {
-            distance = 1; // spacialVariance(targetVec, featureVec);
+            distance = similarObject(targetVec, featureVec); // spacialVariance(targetVec, featureVec);
         }
         else if (matchingAlgo.compare("laws") == 0)
         {
@@ -388,25 +395,27 @@ void displayImages(vector<string> imageVec, string dirPath)
     vector<Mat> images(imageVec.size());
     for (int i = 0; i < imageVec.size(); i++)
     {
-        imagePath = dirPath + imageVec[i];
+        imagePath = dirPath + "/"+ imageVec[i];
         images[i] = imread(imagePath);
     }
 
-    // Display images
-    for (int i = 0; i < images.size(); i++)
-    {
-        imshow("Matched imaged", images[i]);
-    }
-
-    while (true)
-    {
-        char key = (char)cv::waitKey(0); // explicit cast
-        if (key == 'q')
-        {
-            break;
+    cv::String windowName = "imgWindow";
+    cv::namedWindow(windowName);
+    int i=0;
+    cv::imshow(windowName, images[i]);
+    char keyCode = cv::waitKey(0);
+    while(keyCode!='q'){
+        if(keyCode == 'n' && i<images.size()-1){
+            i++;
+            cv::imshow(windowName, images[i]);
+        }else if(keyCode == 'p' && i>0){
+            i--;
+            cv::imshow(windowName, images[i]);
         }
+        keyCode = cv::waitKey(0);
     }
-
+    cv::destroyWindow(windowName);
+    return;
 }
 
 /*
