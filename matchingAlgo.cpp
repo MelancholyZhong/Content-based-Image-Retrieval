@@ -8,11 +8,13 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include <string.h>
 // opencv
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 #include "histograms.h"
+#include "fileHelper.h"
 
 using namespace std;
 using namespace cv;
@@ -187,11 +189,19 @@ int lawsMatch(Mat &src, vector<float> &feature)
 
     //  Apply the laws filter kernels to the input image
     vector<Mat> features(5);
+    Mat temp;
+    int histSize = 256;
+    float range[] = {0, 256};
+    const float *histRange[] = {range};
+    bool uniform = true, accumulate = false;
+    int channels[] = {0, 1, 2};
     for (int i = 0; i < 5; i++)
     {
-        filter2D(src, features[i], -1, kernel[i]);
-        cout << features[i].rows << "-" << features[i].cols << "-" <<  features[i].channels() <<endl; // CV_8U C3
+        filter2D(src, temp, -1, kernel[i]);
+        calcHist(&temp, 1, channels, Mat(), features[i], 1, &histSize, histRange, uniform, accumulate);
+        cout << features[i].rows << "-" << features[i].cols << "-" << features[i].channels() << endl; // CV_8U C3
     }
+
     return 0;
 }
 
@@ -209,7 +219,7 @@ float histogramDis(vector<float> target, vector<float> candidate)
         distance += min(target[i], candidate[i]);
     }
 
-    return 1 - distance;
+    return -distance;
 }
 
 // Use features of co-occurrence matrices as feature vector

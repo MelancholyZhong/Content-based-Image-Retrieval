@@ -11,16 +11,39 @@
 #include <dirent.h>
 #include "matchingAlgo.h"
 #include "histograms.h"
+#include "distances.h"
 #include <queue>     // for min heap
 #include <algorithm> // std::reverse
+#include <string>
 
 // openCV
 #include <opencv2/opencv.hpp>
+#include <opencv2/highgui.hpp>
 // #include <opencv2/imgcodecs.hpp>
 // #include <opencv2/imgproc.hpp>
 
 using namespace std;
 using namespace cv;
+
+char *convertToCharArray(string s)
+{
+    char *char_arr = &s[0];
+    return char_arr;
+}
+
+// converts character array to string and returns it
+string convertToString(char *a)
+{
+    string s(a);
+    // int size = sizeof(a) / sizeof(char);
+    // int i;
+    // string s = "";
+    // for (i = 0; i < size; i++)
+    // {
+    //     s = s + a[i];
+    // }
+    return s;
+}
 
 /*
   AppendFeatureVec function: append the feature vector data to CSV file
@@ -31,7 +54,7 @@ using namespace cv;
   Date sample:
   "imagename,float,float,float,...float\n"
  */
-int appendFeatureVec(std::string filename, char *dirname, char* matchingAlgo)
+int appendFeatureVec(std::string filename, string dirname, string matchingAlgo)
 {
     // Variables for CSV file
     char buffer[256];
@@ -47,10 +70,10 @@ int appendFeatureVec(std::string filename, char *dirname, char* matchingAlgo)
     char tmp[256];
 
     // Open the directory
-    dirp = opendir(dirname);
+    dirp = opendir(convertToCharArray(dirname));
     if (dirp == NULL)
     {
-        printf("Cannot open directory %s\n", dirname);
+        printf("Cannot open directory %s\n", convertToCharArray(dirname));
         exit(-1);
     }
 
@@ -66,11 +89,11 @@ int appendFeatureVec(std::string filename, char *dirname, char* matchingAlgo)
         strcpy(mode, "a");
     }
 
-    fp = fopen(filename, mode);
+    fp = fopen(convertToCharArray(filename), mode);
 
     if (!fp)
     {
-        printf("Unable to open output file %s\n", filename);
+        printf("Unable to open output file %s\n", convertToCharArray(filename));
         exit(-1);
     }
 
@@ -84,7 +107,7 @@ int appendFeatureVec(std::string filename, char *dirname, char* matchingAlgo)
             strstr(dp->d_name, ".tif"))
         {
             // Build the overall filename
-            strcpy(buffer, dirname);
+            strcpy(buffer, convertToCharArray(dirname));
             strcat(buffer, "/");
             strcat(buffer, dp->d_name);
 
@@ -96,26 +119,45 @@ int appendFeatureVec(std::string filename, char *dirname, char* matchingAlgo)
             // Get candidate image
             candidate = imread(buffer);
 
-            switch (matchingAlgo)
+            if (matchingAlgo.compare("baseline") == 0)
             {
-            case "baseline":
-                baselineMatch(target, featureVec);
-                break;
-            case "color":
-                colorHistogram(target, featureVec);
-                break;
-            case "magnitude":
-                magnitudeHistogram(target, featureVec);
-                break;
-            case "objectSpacial":
-                objectSpatial(target, featureVec);
-                break;
-            case "spacialVariance":
-                spacialVariance(target, featureVec);
-                break;
-            default:
-                baselineMatch(target, featureVec);
-                break;
+                baselineMatch(candidate, feature);
+            }
+            else if (matchingAlgo.compare("color") == 0)
+            {
+                colorHistogram(candidate, feature);
+            }
+            else if (matchingAlgo.compare("magnitude") == 0)
+            {
+                magnitudeHistogram(candidate, feature);
+            }
+            else if (matchingAlgo.compare("objectSpacial") == 0)
+            {
+                objectSpatial(candidate, feature);
+            }
+            else if (matchingAlgo.compare("spacialVariance") == 0)
+            {
+                spacialVariance(candidate, feature);
+            }
+            else if (matchingAlgo.compare("laws") == 0)
+            {
+                lawsMatch(candidate, feature);
+            }
+            else if (matchingAlgo.compare("multiHistogram") == 0)
+            {
+                multiHistogramMatch(candidate, feature);
+            }
+            else if (matchingAlgo.compare("coMatrix") == 0)
+            {
+                comatrixMatch(candidate, feature);
+            }
+            else if (matchingAlgo.compare("gradient") == 0)
+            {
+                gradientMatch(candidate, feature);
+            }
+            else
+            {
+                baselineMatch(candidate, feature);
             }
 
             // Write feature vector to CSV file
@@ -229,7 +271,7 @@ public:
     }
 };
 
-vector<string> readFeatureVec(std::string filename, vector<float> &targetVec, char* matchingAlgo, int N = 3)
+vector<string> readFeatureVec(std::string filename, vector<float> &targetVec, string matchingAlgo, int N = 3)
 {
     vector<string> result = {};
     priority_queue<string, vector<string>, Comparator> minHeap;
@@ -240,7 +282,7 @@ vector<string> readFeatureVec(std::string filename, vector<float> &targetVec, ch
     vector<float> featureVec;
 
     // Open CSV file
-    fp = fopen(filename, "r");
+    fp = fopen(convertToCharArray(filename), "r");
     if (!fp)
     {
         printf("Unable to open feature file\n");
@@ -266,14 +308,46 @@ vector<string> readFeatureVec(std::string filename, vector<float> &targetVec, ch
         }
 
         // Get distance
-        switch (matchingAlgo)
+
+        if (matchingAlgo.compare("baseline") == 0)
         {
-        case 'b':
             distance = baselineDis(targetVec, featureVec);
-            break;
-        default:
-            distance = 3;
-            break;
+        }
+        else if (matchingAlgo.compare("color") == 0)
+        {
+            distance = 1; // colorHistogram(targetVec, featureVec);
+        }
+        else if (matchingAlgo.compare("magnitude") == 0)
+        {
+            distance = 1; // magnitudeHistogram(targetVec, featureVec);
+        }
+        else if (matchingAlgo.compare("objectSpacial") == 0)
+        {
+            distance = 1; // objectSpatial(targetVec, featureVec);
+        }
+        else if (matchingAlgo.compare("spacialVariance") == 0)
+        {
+            distance = 1; // spacialVariance(targetVec, featureVec);
+        }
+        else if (matchingAlgo.compare("laws") == 0)
+        {
+            distance = histogramDis(targetVec, featureVec);
+        }
+        else if (matchingAlgo.compare("multiHistogram") == 0)
+        {
+            distance = histogramDis(targetVec, featureVec);
+        }
+        else if (matchingAlgo.compare("coMatrix") == 0)
+        {
+            distance = comatrixDis(targetVec, featureVec);
+        }
+        else if (matchingAlgo.compare("gradient") == 0)
+        {
+            distance = histogramDis(targetVec, featureVec);
+        }
+        else
+        {
+            distance = baselineDis(targetVec, featureVec);
         }
 
         // Add new (image_name, distance) pair to dict
@@ -305,33 +379,135 @@ vector<string> readFeatureVec(std::string filename, vector<float> &targetVec, ch
     return result;
 }
 
-// converts character array to string and returns it
-string convertToString(char *a)
-{
-    int size = sizeof(a) / sizeof(char);
-    int i;
-    string s = "";
-    for (i = 0; i < size; i++)
-    {
-        s = s + a[i];
-    }
-    return s;
-}
-
 // Display all images horizontally
-void displayImages(vector<string> imageVec, char *filename)
+void displayImages(vector<string> imageVec, string dirPath)
 {
-    string dirPath = convertToString(filename);
     string imagePath;
 
     // Get images
     vector<Mat> images(imageVec.size());
     for (int i = 0; i < imageVec.size(); i++)
     {
-        imagePath = = dirPath + imageVec[i];
+        imagePath = dirPath + imageVec[i];
         images[i] = imread(imagePath);
     }
 
     // Display images
-    
+    for (int i = 0; i < images.size(); i++)
+    {
+        imshow("Matched imaged", images[i]);
+    }
+
+    while (true)
+    {
+        char key = (char)cv::waitKey(0); // explicit cast
+        if (key == 'q')
+        {
+            break;
+        }
+    }
+
 }
+
+/*
+void ShowManyImages(string title, int nArgs, ...)
+{
+    int size;
+    int i;
+    int m, n;
+    int x, y;
+
+    // w - Maximum number of images in a row
+    // h - Maximum number of images in a column
+    int w, h;
+
+    // scale - How much we have to resize the image
+    float scale;
+    int max;
+
+    // Determine the size of the image,
+    // and the number of rows/cols
+    // from number of arguments
+    if (nArgs == 1)
+    {
+        w = h = 1;
+        size = 300;
+    }
+    else if (nArgs == 2)
+    {
+        w = 2;
+        h = 1;
+        size = 300;
+    }
+    else if (nArgs == 3 || nArgs == 4)
+    {
+        w = 2;
+        h = 2;
+        size = 300;
+    }
+    else if (nArgs == 5 || nArgs == 6)
+    {
+        w = 3;
+        h = 2;
+        size = 200;
+    }
+    else if (nArgs == 7 || nArgs == 8)
+    {
+        w = 4;
+        h = 2;
+        size = 200;
+    }
+    else
+    {
+        w = 4;
+        h = 3;
+        size = 150;
+    }
+
+    // Create a new 3 channel image
+    Mat DispImage = Mat::zeros(Size(100 + size * w, 60 + size * h), CV_8UC3);
+
+    // Used to get the arguments passed
+    va_list args;
+    va_start(args, nArgs);
+
+    // Loop for nArgs number of arguments
+    for (i = 0, m = 20, n = 20; i < nArgs; i++, m += (20 + size))
+    {
+        Mat img = va_arg(args, Mat);
+
+        // Find the width and height of the image
+        x = img.cols;
+        y = img.rows;
+
+        // Find whether height or width is greater in order to resize the image
+        max = (x > y) ? x : y;
+
+        // Find the scaling factor to resize the image
+        scale = (float)((float)max / size);
+
+        // Used to Align the images
+        if (i % w == 0 && m != 20)
+        {
+            m = 20;
+            n += 20 + size;
+        }
+
+        // Set the image ROI to display the current image
+        // Resize the input image and copy the it to the Single Big Image
+        Rect ROI(m, n, (int)(x / scale), (int)(y / scale));
+        Mat temp;
+        resize(img, temp, Size(ROI.width, ROI.height));
+        temp.copyTo(DispImage(ROI));
+    }
+
+    // Create a new window, and show the Single Big Image
+    namedWindow(title, 1);
+    imshow(title, DispImage);
+    waitKey();
+
+    // End the number of arguments
+    va_end(args);
+}
+
+*/
