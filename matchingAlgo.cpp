@@ -190,7 +190,7 @@ int lawsMatch(Mat &src, vector<float> &feature)
     for (int i = 0; i < 5; i++)
     {
         filter2D(src, features[i], -1, kernel[i]);
-        cout << features[i].type() << endl; // CV_8U C3
+        cout << features[i].rows << "-" << features[i].cols << "-" <<  features[i].channels() <<endl; // CV_8U C3
     }
     return 0;
 }
@@ -209,7 +209,7 @@ float histogramDis(vector<float> target, vector<float> candidate)
         distance += min(target[i], candidate[i]);
     }
 
-    return distance;
+    return 1 - distance;
 }
 
 // Use features of co-occurrence matrices as feature vector

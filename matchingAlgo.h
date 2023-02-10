@@ -40,4 +40,7 @@ int comatrixMatch(Mat &src, vector<float> &feature);
 // Use weighted sum as the distance metric
 float comatrixDis(vector<float> target, vector<float> candidate);
 
+// Display all images horizontally
+void displayImages(vector<string> imageVec, char* filename);
+
 #endif

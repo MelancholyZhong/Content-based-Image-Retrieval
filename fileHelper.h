@@ -11,8 +11,8 @@
 
 using namespace std;
 
-int appendFeatureVec(char *filename, char *dirname, char matchingAlgo);
+int appendFeatureVec(std::string filename, char *dirname, char* matchingAlgo);
 
-vector<string> readFeatureVec(char *filename, vector<float> &targetVec, char matchingAlgo, int N = 3);
+vector<string> readFeatureVec(std::string filename, vector<float> &targetVec, char *matchingAlgo, int N = 3);
 
 #endif

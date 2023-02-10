@@ -10,6 +10,7 @@
 #include <iostream>
 #include <dirent.h>
 #include "matchingAlgo.h"
+#include "histograms.h"
 #include <queue>     // for min heap
 #include <algorithm> // std::reverse
 
@@ -30,7 +31,7 @@ using namespace cv;
   Date sample:
   "imagename,float,float,float,...float\n"
  */
-int appendFeatureVec(char *filename, char *dirname, char matchingAlgo)
+int appendFeatureVec(std::string filename, char *dirname, char* matchingAlgo)
 {
     // Variables for CSV file
     char buffer[256];
@@ -95,13 +96,25 @@ int appendFeatureVec(char *filename, char *dirname, char matchingAlgo)
             // Get candidate image
             candidate = imread(buffer);
 
-            // Get the feature vector
             switch (matchingAlgo)
             {
-            case 'b':
-                baselineMatch(candidate, feature);
+            case "baseline":
+                baselineMatch(target, featureVec);
+                break;
+            case "color":
+                colorHistogram(target, featureVec);
+                break;
+            case "magnitude":
+                magnitudeHistogram(target, featureVec);
+                break;
+            case "objectSpacial":
+                objectSpatial(target, featureVec);
+                break;
+            case "spacialVariance":
+                spacialVariance(target, featureVec);
                 break;
             default:
+                baselineMatch(target, featureVec);
                 break;
             }
 
@@ -216,7 +229,7 @@ public:
     }
 };
 
-vector<string> readFeatureVec(char *filename, vector<float> &targetVec, char matchingAlgo, int N = 3)
+vector<string> readFeatureVec(std::string filename, vector<float> &targetVec, char* matchingAlgo, int N = 3)
 {
     vector<string> result = {};
     priority_queue<string, vector<string>, Comparator> minHeap;
@@ -267,7 +280,7 @@ vector<string> readFeatureVec(char *filename, vector<float> &targetVec, char mat
         dict[imagename] = distance;
 
         // Add new distance to min-Heap
-        if (distance > 0.001)  // Avoid target image itself
+        if (distance > 0.001) // Avoid target image itself
         {
             minHeap.push(imagename);
         }
@@ -290,4 +303,35 @@ vector<string> readFeatureVec(char *filename, vector<float> &targetVec, char mat
     reverse(result.begin(), result.end());
 
     return result;
+}
+
+// converts character array to string and returns it
+string convertToString(char *a)
+{
+    int size = sizeof(a) / sizeof(char);
+    int i;
+    string s = "";
+    for (i = 0; i < size; i++)
+    {
+        s = s + a[i];
+    }
+    return s;
+}
+
+// Display all images horizontally
+void displayImages(vector<string> imageVec, char *filename)
+{
+    string dirPath = convertToString(filename);
+    string imagePath;
+
+    // Get images
+    vector<Mat> images(imageVec.size());
+    for (int i = 0; i < imageVec.size(); i++)
+    {
+        imagePath = = dirPath + imageVec[i];
+        images[i] = imread(imagePath);
+    }
+
+    // Display images
+    
 }
