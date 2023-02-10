@@ -1,7 +1,7 @@
 #ifndef HISTOGRAMS
 #define HISTOGRAMS
 
-int colorHistogram(cv::Mat &src, std::vector<float> &feature);
+int colorHistogram(cv::Mat &src, std::vector<float> &feature, bool center=false);
 
 int magnitudeHistogram(cv::Mat &src, std::vector<float> &feature);
 

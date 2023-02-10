@@ -14,14 +14,14 @@ using namespace cv;
 
 int main(int argc, char *argv[])
 {
-    cv::Mat target = imread("training/pic.0080.jpg");
-    string database = "training";
+    cv::Mat target = imread("olympus/pic.0535.jpg");
+    string database = "olympus";
     string method = "baseline";
-    int N = 3;
+    int N = 4;
     if (argc < 5)
     {
         std::cout << "please input correct arguments" << std::endl;
-        // exit(-2);
+        exit(-2);
     }
     else
     {
@@ -107,6 +107,7 @@ int main(int argc, char *argv[])
     for(int i = 0; i < res.size(); i++){
         cout << res[i] << endl;
     }
+
     displayImages(res, database);
 
     return 0;

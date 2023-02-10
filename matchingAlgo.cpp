@@ -64,14 +64,13 @@ int multiHistogramMatch(Mat &src, vector<float> &feature)
     vector<float> centerFeature;
 
     colorHistogram(src, wholeFeature);
-    colorHistogram(src, centerFeature);
+    colorHistogram(src, centerFeature, true);
 
     // initialize feature vector
     feature = {};
     // combine two feature vectors
     feature.insert(feature.end(), wholeFeature.begin(), wholeFeature.end());
     feature.insert(feature.end(), centerFeature.begin(), centerFeature.end());
-
     return 0;
 }
 
@@ -84,19 +83,20 @@ float multiHistogramDis(vector<float> target, vector<float> candidate)
     float weight = 0.4;  // the weight of wholeDis, between 0 and 1
 
     int size = candidate.size() / 2;
-
+    cout << distance << endl;
     for (int i = 0; i < size; i++)
     {
         wholeDis += std::min(target[i], candidate[i]);
     }
-    for (int i = size; i < 2 * size; i++)
+    
+    for (int i = size; i < candidate.size(); i++)
     {
         centerDis += std::min(target[i], candidate[i]);
     }
 
     // Get the biased distance
-    distance = weight * wholeDis + (1 - weight) * centerDis;
-
+    distance = 1 - (weight * wholeDis + (1 - weight) * centerDis);
+    
     return distance;
 }
 
@@ -188,7 +188,7 @@ int lawsMatch(Mat &src, vector<float> &feature)
     }
 
     //  Apply the laws filter kernels to the input image
-    vector<Mat> features(5);
+    vector<Mat> featureVec(5);
     Mat temp;
     int histSize = 256;
     float range[] = {0, 256};
@@ -198,8 +198,17 @@ int lawsMatch(Mat &src, vector<float> &feature)
     for (int i = 0; i < 5; i++)
     {
         filter2D(src, temp, -1, kernel[i]);
-        calcHist(&temp, 1, channels, Mat(), features[i], 1, &histSize, histRange, uniform, accumulate);
-        cout << features[i].rows << "-" << features[i].cols << "-" << features[i].channels() << endl; // CV_8U C3
+        calcHist(&temp, 1, channels, Mat(), featureVec[i], 1, &histSize, histRange, uniform, accumulate);
+    }
+
+    // Get the feature
+    feature = {};
+    Mat_<float> vect;
+    for(int i = 0; i < 5; i++){
+        vect = featureVec[i];
+        for(int r = 0; r < featureVec[i].rows; r++){
+            feature.push_back(vect(r, 0));
+        }
     }
 
     return 0;
@@ -272,7 +281,7 @@ float comatrixDis(vector<float> target, vector<float> candidate)
     float distance = 0.0;
     for (int i = 0; i < target.size(); i++)
     {
-        distance += abs(target[0] - candidate[0]) / target[0] * 100.0 * weight[i];
+        distance += (abs(target[0] - candidate[0]) / target[0]) * 100.0 * weight[i];
     }
 
     return distance;

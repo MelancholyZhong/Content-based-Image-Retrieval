@@ -6,14 +6,16 @@
 using namespace std;
 
 
-int colorHistogram(cv::Mat &src, std::vector<float> &feature){
+int colorHistogram(cv::Mat &src, std::vector<float> &feature, bool center){
     int size = 8*8*8;
     feature = vector<float>(size, 0.0);
+    int r = center ? src.rows / 3 : 0;
+    int c = src.cols / 3;
 
     //counting
-    for(int i=0;i<src.rows; i++){
+    for(int i= 0 + r; i<src.rows - r ; i++){
         cv::Vec3b *rptr = src.ptr<cv::Vec3b>(i);
-        for(int j=0;j<src.cols;j++){
+        for(int j=0 + c;j<src.cols - c;j++){
             int bin0 = rptr[j][0]/32;  //determin which bin it is, here are 8 bins for [0,255]
             int bin1 = rptr[j][1]/32;
             int bin2 = rptr[j][2]/32;
@@ -24,7 +26,7 @@ int colorHistogram(cv::Mat &src, std::vector<float> &feature){
 
      //normalization
     for(int i=0; i<feature.size(); i++){
-        feature[i] = feature[i]/(src.rows*src.cols);  
+        feature[i] = feature[i]/((src.rows - 2 * r) * (src.cols - 2 * c));  
     }
     return 0;
 }

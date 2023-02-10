@@ -35,13 +35,6 @@ char *convertToCharArray(string s)
 string convertToString(char *a)
 {
     string s(a);
-    // int size = sizeof(a) / sizeof(char);
-    // int i;
-    // string s = "";
-    // for (i = 0; i < size; i++)
-    // {
-    //     s = s + a[i];
-    // }
     return s;
 }
 
@@ -361,7 +354,7 @@ vector<string> readFeatureVec(std::string filename, vector<float> &targetVec, st
         dict[imagename] = distance;
 
         // Add new distance to min-Heap
-        if (distance > 0.001) // Avoid target image itself
+        if (abs(distance) > 0.001) // Avoid target image itself
         {
             minHeap.push(imagename);
         }
