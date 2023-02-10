@@ -31,12 +31,6 @@ int gradientMatch(Mat &src, vector<float> &feature);
 // Use histogram of Laws filter responses as feature vector
 int lawsMatch(Mat &src, vector<float> &feature);
 
-// Use histogram of Gabor filter responses as feature vector
-int gaborMatch(Mat &src, vector<float> &feature);
-
-// Given number of bins, Get histogram of image
-
-
 // Use histogram intersection as the distance metric
 float histogramDis(vector<float> target, vector<float> candidate);
 
@@ -45,6 +39,5 @@ int comatrixMatch(Mat &src, vector<float> &feature);
 
 // Use weighted sum as the distance metric
 float comatrixDis(vector<float> target, vector<float> candidate);
-
 
 #endif

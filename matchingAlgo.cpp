@@ -195,9 +195,6 @@ int lawsMatch(Mat &src, vector<float> &feature)
     return 0;
 }
 
-// Use histogram of Gabor filter responses as feature vector
-int gaborMatch(Mat &src, vector<float> &feature);
-
 // Use histogram intersection as the distance metric
 float histogramDis(vector<float> target, vector<float> candidate)
 {
