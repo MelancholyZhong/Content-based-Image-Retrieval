@@ -1,6 +1,8 @@
 #ifndef HISTOGRAMS
 #define HISTOGRAMS
 
+#include <opencv2/opencv.hpp>
+
 int colorHistogram(cv::Mat &src, std::vector<float> &feature, bool center=false);
 
 int magnitudeHistogram(cv::Mat &src, std::vector<float> &feature);
