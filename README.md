@@ -45,12 +45,17 @@ To view the results
 ## List of methods
 
 `baseline` Task1: baseline matching
+
 `color` Task2: single color histogram matching
+
 `multiHistogram` Task3: multi histogram matching
+
 `magnitude` Task4: color and texture matching
+
 `spacialVariance` Task5: custom design
+
 `laws`,`coMatrix`, or `gradient` Extensions: different texture matchings
 
-## notes
+## FYI
 
 Generating feature files for task 4 and task 5 for the first time may take 2-3 minutes.
