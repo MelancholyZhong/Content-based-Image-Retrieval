@@ -3,9 +3,10 @@
 #include <opencv2/opencv.hpp>
 #include "histograms.h"
 
+//Yao Zhong
 using namespace std;
 
-
+//Task2: calculte the color histogram of a image, store the feature vector in specified place.
 int colorHistogram(cv::Mat &src, std::vector<float> &feature, bool center){
     int size = 8*8*8;
     feature = vector<float>(size, 0.0);
@@ -33,7 +34,6 @@ int colorHistogram(cv::Mat &src, std::vector<float> &feature, bool center){
 
 
 //Solbel filters and magnitude filters from project #1 used in this problem
-
 int sobel_calc(cv::Mat &src, cv::Mat &dst, int (&sobel)[3][3]){
     dst = cv::Mat::zeros(src.size(), CV_16SC3);
     for(int i=0;i<src.rows; i++){
@@ -63,7 +63,7 @@ int sobel_calc(cv::Mat &src, cv::Mat &dst, int (&sobel)[3][3]){
     }
     return 0;
 }
-
+//calculate x solbel
 int sobelX3x3(cv::Mat &src, cv::Mat &dst ){
     int xsobel[3][3] = {
         {-1,0,1},
@@ -74,6 +74,7 @@ int sobelX3x3(cv::Mat &src, cv::Mat &dst ){
     return 0;
 }
 
+//calculate y sobel
 int sobelY3x3( cv::Mat &src, cv::Mat &dst ){
     int ysobel[3][3] = {
         {1,2,1},
@@ -84,6 +85,7 @@ int sobelY3x3( cv::Mat &src, cv::Mat &dst ){
     return 0;
 }
 
+//calculate the gradient magnitude
 int magnitude( cv::Mat &sx, cv::Mat &sy, cv::Mat &dst ){
     dst = cv::Mat::zeros(sx.size(), CV_16SC3);
     for(int i=0;i<sx.rows; i++){
@@ -100,7 +102,7 @@ int magnitude( cv::Mat &sx, cv::Mat &sy, cv::Mat &dst ){
     return 0;
 }
 
-
+//Task 4: calculate the histogram of magnitude
 int magnitudeHistogram(cv::Mat &src, std::vector<float> &feature){
     int size = 8*8*8;
     feature = vector<float>(size, 0.0);
@@ -132,7 +134,7 @@ int magnitudeHistogram(cv::Mat &src, std::vector<float> &feature){
     return 0;
 }
 
-// a feature that descibes the main color's dstribution in the space
+// Task5: (first attemption, not the final version)a feature that descibes the main color's dstribution in the space
 int objectSpatial(cv::Mat &src, std::vector<float> &feature){
     //Calculate the primary colors in the image
     std::vector<float> colorDensity;
@@ -182,7 +184,7 @@ int objectSpatial(cv::Mat &src, std::vector<float> &feature){
     return 0;
 }
 
-
+//Task 5: calculate each color bin's standard deviation as the spatial variance
 int spacialVariance(cv::Mat &src, std::vector<float> &feature){
     int size = 8*8*8;
     std::vector<float> m00= vector<float>(size, 0.0); //m00 is the pixel count for each color region
@@ -230,6 +232,7 @@ int spacialVariance(cv::Mat &src, std::vector<float> &feature){
     return 0;
 }
 
+//helper function that makes a composite feature from two different features.
 int twoComposite(std::vector<float> &feature1, std::vector<float> &feature2){
     feature1.insert(feature1.end(), feature2.begin(), feature2.end());
     return 0;

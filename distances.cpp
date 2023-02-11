@@ -4,7 +4,9 @@
 #include "distances.h"
 
 using namespace std;
+//Yao Zhong
 
+//The helper function used to calculate the intersections
 float intersection(vector<float> &target, vector<float> &candidate){
     float distance = 0;
     int size = candidate.size();
@@ -14,11 +16,13 @@ float intersection(vector<float> &target, vector<float> &candidate){
     return distance;
 }
 
+//Task2: The function used to calculate the color histogram distance
 float colorDis(vector<float> &target, vector<float> &candidate){
     float distance = intersection(target, candidate);
     return 1-distance; //the high the intersection, the lower the distance
 }
 
+//Task4: Calculate the composite distance of color and magnitude histogram. (metric: intersection)
 float magnitude_color(std::vector<float> &target, std::vector<float> &candidate, float weight1, float weight2){
     int size = target.size()/2;
     //here target and candidate feature, are a composite of colorhistogram and its magnitude(each 8*8*8).
@@ -32,6 +36,7 @@ float magnitude_color(std::vector<float> &target, std::vector<float> &candidate,
     return 1-distance;
 }
 
+//Task5: Calculate the composite distance of color histogram and the spatial variance.
 float similarObject(std::vector<float> &target, std::vector<float> &candidate){
     //here target and candidate feature, are a composite of colorhistogram and its spacial variance(each 8*8*8). 
     int size = target.size()/2;
