@@ -1,7 +1,7 @@
 CC = g++
 CFLAGS = -g -Wall -std=c++11 
 CAM_PLIST_FLAG = -sectcreate __TEXT __info_plist Info.plist
-PRODUCTS = match test.csv
+PRODUCTS = match *.csv
 
 
 OPENCV = `pkg-config opencv4 --cflags --libs`

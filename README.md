@@ -56,6 +56,8 @@ To view the results
 
 `laws`,`coMatrix`, or `gradient` Extensions: different texture matchings
 
+`objectSpacial` was our first attempt for Task5, it can be considered as a extension(if possible)
+
 ## FYI
 
 Generating feature files for task 4 and task 5 for the first time may take 2-3 minutes.
