@@ -224,7 +224,7 @@ int spacialVariance(cv::Mat &src, std::vector<float> &feature){
 
     feature = std::vector<float>(size, 0.0);
     for(int i=0; i<size; i++){
-        feature[i] = std::sqrt(miu22[i]/m00[i]);//get the standard deviation for each bin
+        feature[i] = std::sqrt(miu22[i]/m00[i]);//get the standard deviation for each bins
     }
     
     return 0;
