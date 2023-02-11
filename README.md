@@ -7,7 +7,9 @@ If encounter any problems, please feel free to contact us via email hu.hui1@nort
 ## Environment
 
 MacOS M1 chip
+
 IDE: VS Code
+
 Build with Makefile
 
 ## Links
