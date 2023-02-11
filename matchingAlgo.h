@@ -1,6 +1,8 @@
 /**
     Matching Algorithm for Content-based Image Retrieval (CBIR)
     Created by Hui Hu for CS 5330 Computer Vision Spring 2023
+
+    Functions to extract feature vector and calculate the distance
 */
 
 #ifndef MATCHING_ALGO
