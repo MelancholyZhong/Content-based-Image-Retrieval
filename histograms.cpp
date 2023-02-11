@@ -136,7 +136,11 @@ int magnitudeHistogram(cv::Mat &src, std::vector<float> &feature){
 int objectSpatial(cv::Mat &src, std::vector<float> &feature){
     //Calculate the primary colors in the image
     std::vector<float> colorDensity;
-    colorHistogram(src, colorDensity);
+    int thirdCol = src.cols/3;
+    int thirdRow = src.rows/3;
+    cv::Rect roi(thirdRow, thirdCol, 2*thirdRow, 2*thirdCol); //The center peice of the original pic
+    cv::Mat subImg = src(roi);
+    colorHistogram(subImg, colorDensity);
     int mainColor = 0;
     float maxDistribution = 0.0;
     for(int i=0; i<colorDensity.size(); i++){
@@ -220,7 +224,7 @@ int spacialVariance(cv::Mat &src, std::vector<float> &feature){
 
     feature = std::vector<float>(size, 0.0);
     for(int i=0; i<size; i++){
-        feature[i] = miu22[i]/m00[i];
+        feature[i] = std::sqrt(miu22[i]/m00[i]);//get the standard deviation for each bin
     }
     
     return 0;

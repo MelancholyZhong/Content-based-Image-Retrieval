@@ -13,7 +13,7 @@ using namespace std;
 
 int appendFeatureVec(std::string filename, std::string dirname, std::string matchingAlgo);
 
-std::vector<std::string> readFeatureVec(std::string filename, std::vector<float> &targetVec, std::string matchingAlgo, int N = 3);
+std::vector<std::string> readFeatureVec(std::string filename, std::string targetname,std::vector<float> &targetVec, std::string matchingAlgo, int N = 3);
 
 std::string convertToString(char *a);
 char* convertToCharArray(std::string s);

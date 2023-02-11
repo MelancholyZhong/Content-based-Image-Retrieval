@@ -14,10 +14,11 @@ using namespace cv;
 
 int main(int argc, char *argv[])
 {
-    cv::Mat target = imread("olympus/pic.0535.jpg");
-    string database = "olympus";
-    string method = "baseline";
-    int N = 4;
+    cv::Mat target;
+    string targetname;
+    string database;
+    string method;
+    int N;
     if (argc < 5)
     {
         std::cout << "please input correct arguments" << std::endl;
@@ -25,7 +26,9 @@ int main(int argc, char *argv[])
     }
     else
     {
-        char *targetDir = argv[1];
+        targetname = convertToString(argv[1]);
+        database = convertToString(argv[2]);
+        string targetDir = database + "/" + targetname;
         target = cv::imread(targetDir);
         database = convertToString(argv[2]);
         method = convertToString(argv[3]);
@@ -102,7 +105,7 @@ int main(int argc, char *argv[])
 
     // Get feature vector of all images in directory and
     // return the names of N most close images
-    vector<string> res = readFeatureVec(databaseFeature, featureVec, method, N);
+    vector<string> res = readFeatureVec(databaseFeature, targetname, featureVec, method, N);
 
     for(int i = 0; i < res.size(); i++){
         cout << res[i] << endl;

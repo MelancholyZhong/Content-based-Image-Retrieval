@@ -271,7 +271,7 @@ public:
 };
 
 
-vector<string> readFeatureVec(std::string filename, vector<float> &targetVec, string matchingAlgo, int N = 3)
+vector<string> readFeatureVec(std::string filename, std::string targetname, vector<float> &targetVec, string matchingAlgo, int N = 3)
 {
     vector<string> result = {};
     priority_queue<string, vector<string>, Comparator> minHeap;
@@ -294,9 +294,13 @@ vector<string> readFeatureVec(std::string filename, vector<float> &targetVec, st
     {
         featureVec = {};
 
+
         // Read image name, if reached the last line, exit loop
         if (getstring(fp, imagename))
             break;
+        if(targetname.compare(imagename) == 0){
+            continue;
+        }
 
         // Read feature vector
         for (;;)
@@ -319,7 +323,7 @@ vector<string> readFeatureVec(std::string filename, vector<float> &targetVec, st
         }
         else if (matchingAlgo.compare("magnitude") == 0)
         {
-            distance = magnitude_color(targetVec, featureVec); // magnitudeHistogram(targetVec, featureVec);
+            distance = magnitude_color(targetVec, featureVec, 0.5, 0.5); // magnitudeHistogram(targetVec, featureVec);
         }
         else if (matchingAlgo.compare("objectSpacial") == 0)
         {
